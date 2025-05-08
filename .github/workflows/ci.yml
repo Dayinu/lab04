@@ -22,28 +22,37 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake build-essential clang
 
-      - name: Prepare build
+      - name: Build formatter_lib
         run: |
-          mkdir -p build
-          ls -R  # Для отладки структуры
+          mkdir -p formatter_lib/build && cd formatter_lib/build
+          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ ..
+          cmake --build .
 
-      - name: Configure
-        working-directory: ./build
+      - name: Build formatter_ex_lib
         run: |
-          cmake \
-            -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ \
-            -Dformatter_lib_SOURCE_DIR=../formatter_lib \
-            -Dformatter_ex_lib_SOURCE_DIR=../formatter_ex_lib \
-            -Dsolver_lib_SOURCE_DIR=../solver_lib \
-            ../
+          mkdir -p formatter_ex_lib/build && cd formatter_ex_lib/build
+          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ -Dformatter_DIR=../formatter_lib/build ..
+          cmake --build .
 
-      - name: Build
-        working-directory: ./build
+      - name: Build solver_lib
         run: |
-          cmake --build . --target formatter formatter_ex solver_lib
-          cmake --build . --target hello_world_application solver_application
+          mkdir -p solver_lib/build && cd solver_lib/build
+          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ -Dformatter_ex_DIR=../formatter_ex_lib/build ..
+          cmake --build .
+
+      - name: Build applications
+        run: |
+          # Hello World
+          mkdir -p hello_world_application/build && cd hello_world_application/build
+          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ -Dformatter_ex_DIR=../../formatter_ex_lib/build ..
+          cmake --build .
+          
+          # Solver App
+          mkdir -p solver_application/build && cd solver_application/build
+          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ -Dformatter_ex_DIR=../../formatter_ex_lib/build -Dsolver_lib_DIR=../../solver_lib/build ..
+          cmake --build .
 
       - name: Run tests
         run: |
-          ./build/hello_world_application/hello_world
-          ./build/solver_application/solver_application
+          ./hello_world_application/build/hello_world
+          ./solver_application/build/solver_application
