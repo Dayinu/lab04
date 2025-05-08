@@ -22,25 +22,26 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake build-essential clang
 
-      - name: Create build directory
-        run: mkdir -p build
+      - name: Prepare build
+        run: |
+          mkdir -p build
+          ls -R  # Для отладки структуры
 
       - name: Configure
         working-directory: ./build
         run: |
           cmake \
             -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ \
-            -DCMAKE_BUILD_TYPE=Release \
-            -Dformatter_lib_DIR=../formatter_lib \
-            -Dformatter_ex_lib_DIR=../formatter_ex_lib \
-            -Dsolver_lib_DIR=../solver_lib \
-            -Dhello_world_application_DIR=../hello_world_application \
-            -Dsolver_application_DIR=../solver_application \
-            ..
+            -Dformatter_lib_SOURCE_DIR=../formatter_lib \
+            -Dformatter_ex_lib_SOURCE_DIR=../formatter_ex_lib \
+            -Dsolver_lib_SOURCE_DIR=../solver_lib \
+            ../
 
       - name: Build
         working-directory: ./build
-        run: cmake --build . --verbose
+        run: |
+          cmake --build . --target formatter formatter_ex solver_lib
+          cmake --build . --target hello_world_application solver_application
 
       - name: Run tests
         run: |
