@@ -12,53 +12,64 @@ jobs:
     strategy:
       matrix:
         compiler: [ gcc, clang ]
+        include:
+          - compiler: gcc
+            cxx_package: g++
+          - compiler: clang
+            cxx_package: clang
+      fail-fast: false
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake build-essential
+          sudo apt-get install -y \
+            cmake \
+            build-essential \
+            ${{ matrix.cxx_package }} \
+            libfmt-dev
 
-      - name: Build formatter_lib
+      - name: Configure and build formatter_lib
         run: |
           cd formatter_lib
           mkdir -p build && cd build
           cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ ..
-          cmake --build .
+          cmake --build . --verbose
+          ctest --output-on-failure || true
 
-      - name: Build formatter_ex_lib
+      - name: Configure and build formatter_ex_lib
         run: |
           cd formatter_ex_lib
           mkdir -p build && cd build
           cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ ..
-          cmake --build .
+          cmake --build . --verbose
 
-      - name: Build solver_lib
+      - name: Build and test solver
         run: |
           cd solver_lib
           mkdir -p build && cd build
           cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ ..
           cmake --build .
+          ctest --output-on-failure || true
 
-      - name: Build hello_world_application
+      - name: Build applications
         run: |
-          cd hello_world_application
-          mkdir -p build && cd build
-          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ ..
-          cmake --build .
+          for app in hello_world_application solver_application; do
+            cd $app
+            mkdir -p build && cd build
+            cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ ..
+            cmake --build .
+            cd ../..
+          done
 
-      - name: Build solver_application
-        run: |
-          cd solver_application
-          mkdir -p build && cd build
-          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ ..
-          cmake --build .
-
-      - name: Run hello_world
-        run: |
-          ./hello_world_application/build/hello_world
-
-      - name: Run solver_application
-        run: |
-          ./solver_application/build/solver_application
+      - name: Upload build artifacts
+        if: success() || failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.compiler }}-binaries
+          path: |
+            */build/**
+            !**/*.o
+          retention-days: 3
