@@ -1,44 +1,38 @@
-name: Fixed CI Build
+name: CI Build (Linux - GCC & Clang)
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compiler: [gcc, clang]
-      fail-fast: false
-
+        compiler: [ gcc, clang ]
     steps:
       - uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            cmake \
-            build-essential \
-            g++ \
-            clang \
-            libfmt-dev
+          sudo apt-get install -y cmake build-essential
 
-      - name: Build projects
+      - name: Unified Build
         run: |
-          for project in formatter_lib formatter_ex_lib solver_lib; do
-            mkdir -p $project/build
-            cd $project/build
-            cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ ..
-            cmake --build . --verbose
-            cd ../..
-          done
+          mkdir -p unified_build
+          cd unified_build
+          cmake \
+            -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ \
+            -Dformatter_lib_DIR=../formatter_lib \
+            -Dformatter_ex_lib_DIR=../formatter_ex_lib \
+            -Dsolver_lib_DIR=../solver_lib \
+            ..
+          cmake --build . --target all
 
-      - name: Verify applications
+      - name: Run tests
         run: |
-          for app in hello_world_application solver_application; do
-            cd $app
-            mkdir -p build && cd build
-            cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ ..
-            cmake --build .
-            cd ../..
-          done
+          ./unified_build/hello_world_application/hello_world
+          ./unified_build/solver_application/solver_application
