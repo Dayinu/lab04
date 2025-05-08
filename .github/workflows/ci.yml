@@ -25,14 +25,20 @@ jobs:
       - name: Create build directory
         run: mkdir -p build
 
-      - name: Configure (formatter_lib)
+      - name: Configure
         working-directory: ./build
         run: |
           cmake \
             -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ \
-            ../formatter_lib
+            -DCMAKE_BUILD_TYPE=Release \
+            -Dformatter_lib_DIR=../formatter_lib \
+            -Dformatter_ex_lib_DIR=../formatter_ex_lib \
+            -Dsolver_lib_DIR=../solver_lib \
+            -Dhello_world_application_DIR=../hello_world_application \
+            -Dsolver_application_DIR=../solver_application \
+            ..
 
-      - name: Build (formatter_lib)
+      - name: Build
         working-directory: ./build
         run: cmake --build . --verbose
 
