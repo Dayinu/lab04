@@ -1,2 +1,13 @@
 build/
 *.a
+# Build directories
+*build*/
+*install*/
+
+# Editor files
+*.swp
+.idea/
+
+# CMake temporary files
+CMakeCache.txt
+CMakeFiles/

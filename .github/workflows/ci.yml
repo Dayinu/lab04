@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         compiler: [ gcc, clang ]
-      fail-fast: false  # Не отменять другие jobs при ошибке
+      fail-fast: false
 
     steps:
       - uses: actions/checkout@v4
@@ -22,20 +22,19 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake build-essential clang
 
-      - name: Prepare build dir
-        run: |
-          mkdir -p build
-          ls -la formatter_lib/  # Для отладки
+      - name: Create build directory
+        run: mkdir -p build
 
-      - name: Configure
+      - name: Configure (formatter_lib)
+        working-directory: ./build
         run: |
-          cd build
-          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ ..
+          cmake \
+            -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ \
+            ../formatter_lib
 
-      - name: Build
-        run: |
-          cd build
-          cmake --build . --verbose
+      - name: Build (formatter_lib)
+        working-directory: ./build
+        run: cmake --build . --verbose
 
       - name: Run tests
         run: |
