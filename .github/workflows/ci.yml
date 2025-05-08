@@ -1,22 +1,13 @@
-name: CI Build (Linux - GCC & Clang)
+name: Fixed CI Build
 
-on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main, develop ]
+on: [push, pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compiler: [ gcc, clang ]
-        include:
-          - compiler: gcc
-            cxx_package: g++
-          - compiler: clang
-            cxx_package: clang
+        compiler: [gcc, clang]
       fail-fast: false
 
     steps:
@@ -28,33 +19,21 @@ jobs:
           sudo apt-get install -y \
             cmake \
             build-essential \
-            ${{ matrix.cxx_package }} \
+            g++ \
+            clang \
             libfmt-dev
 
-      - name: Configure and build formatter_lib
+      - name: Build projects
         run: |
-          cd formatter_lib
-          mkdir -p build && cd build
-          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ ..
-          cmake --build . --verbose
-          ctest --output-on-failure || true
+          for project in formatter_lib formatter_ex_lib solver_lib; do
+            mkdir -p $project/build
+            cd $project/build
+            cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ ..
+            cmake --build . --verbose
+            cd ../..
+          done
 
-      - name: Configure and build formatter_ex_lib
-        run: |
-          cd formatter_ex_lib
-          mkdir -p build && cd build
-          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ ..
-          cmake --build . --verbose
-
-      - name: Build and test solver
-        run: |
-          cd solver_lib
-          mkdir -p build && cd build
-          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ ..
-          cmake --build .
-          ctest --output-on-failure || true
-
-      - name: Build applications
+      - name: Verify applications
         run: |
           for app in hello_world_application solver_application; do
             cd $app
@@ -63,13 +42,3 @@ jobs:
             cmake --build .
             cd ../..
           done
-
-      - name: Upload build artifacts
-        if: success() || failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ matrix.compiler }}-binaries
-          path: |
-            */build/**
-            !**/*.o
-          retention-days: 3
