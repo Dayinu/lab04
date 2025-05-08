@@ -12,27 +12,32 @@ jobs:
     strategy:
       matrix:
         compiler: [ gcc, clang ]
+      fail-fast: false  # Не отменять другие jobs при ошибке
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake build-essential
+          sudo apt-get install -y cmake build-essential clang
 
-      - name: Unified Build
+      - name: Prepare build dir
         run: |
-          mkdir -p unified_build
-          cd unified_build
-          cmake \
-            -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ \
-            -Dformatter_lib_DIR=../formatter_lib \
-            -Dformatter_ex_lib_DIR=../formatter_ex_lib \
-            -Dsolver_lib_DIR=../solver_lib \
-            ..
-          cmake --build . --target all
+          mkdir -p build
+          ls -la formatter_lib/  # Для отладки
+
+      - name: Configure
+        run: |
+          cd build
+          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ ..
+
+      - name: Build
+        run: |
+          cd build
+          cmake --build . --verbose
 
       - name: Run tests
         run: |
-          ./unified_build/hello_world_application/hello_world
-          ./unified_build/solver_application/solver_application
+          ./build/hello_world_application/hello_world
+          ./build/solver_application/solver_application
