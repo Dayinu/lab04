@@ -11,58 +11,83 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compiler: [ gcc, clang ]
-      fail-fast: false
+        compiler: [ gcc, clang ]  # Тестируем оба компилятора
+      fail-fast: false  # Не останавливать другие jobs при ошибке
 
     steps:
+      # Шаг 1: Получаем исходный код
       - uses: actions/checkout@v4
 
+      # Шаг 2: Устанавливаем зависимости (с последней версией CMake)
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake build-essential clang
+          sudo apt-get install -y build-essential clang
+          
+          # Устанавливаем CMake 3.28+ (для поддержки новых функций)
+          wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc | sudo apt-key add -
+          sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main'
+          sudo apt-get update
+          sudo apt-get install -y cmake
 
+          # Проверяем версии
+          cmake --version
+          ${{ matrix.compiler }}++ --version
+
+      # Шаг 3: Собираем formatter_lib (базовая библиотека)
       - name: Build formatter_lib
-        working-directory: formatter_lib
         run: |
+          cd formatter_lib
           mkdir -p build && cd build
-          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ ..
+          CXX=${{ matrix.compiler }}++ cmake ..  # Явно указываем компилятор
           cmake --build .
+          ls -la  # Проверяем созданные файлы
 
+      # Шаг 4: Собираем formatter_ex_lib (зависит от formatter_lib)
       - name: Build formatter_ex_lib
-        working-directory: formatter_ex_lib
         run: |
+          cd formatter_ex_lib
           mkdir -p build && cd build
-          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ \
-            -Dformatter_DIR=$(realpath ../../formatter_lib/build) ..
+          CXX=${{ matrix.compiler }}++ cmake \
+            -Dformatter_lib_DIR=$(realpath ../../formatter_lib/build) ..  # Абсолютный путь
           cmake --build .
+          ls -la
 
+      # Шаг 5: Собираем solver_lib (зависит от formatter_ex_lib)
       - name: Build solver_lib
-        working-directory: solver_lib
         run: |
+          cd solver_lib
           mkdir -p build && cd build
-          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ \
-            -Dformatter_ex_DIR=$(realpath ../../formatter_ex_lib/build) ..
+          CXX=${{ matrix.compiler }}++ cmake \
+            -Dformatter_ex_lib_DIR=$(realpath ../../formatter_ex_lib/build) ..
+          cmake --build .
+          ls -la
+
+      # Шаг 6: Собираем приложения
+      - name: Build applications
+        run: |
+          # Hello World (зависит от formatter_ex_lib)
+          cd hello_world_application
+          mkdir -p build && cd build
+          CXX=${{ matrix.compiler }}++ cmake \
+            -Dformatter_ex_lib_DIR=$(realpath ../../formatter_ex_lib/build) ..
           cmake --build .
 
-      - name: Build hello_world
-        working-directory: hello_world_application
-        run: |
+          # Solver App (зависит от solver_lib и formatter_ex_lib)
+          cd ../../solver_application
           mkdir -p build && cd build
-          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ \
-            -Dformatter_ex_DIR=$(realpath ../../formatter_ex_lib/build) ..
-          cmake --build .
-
-      - name: Build solver_app
-        working-directory: solver_application
-        run: |
-          mkdir -p build && cd build
-          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ \
-            -Dformatter_ex_DIR=$(realpath ../../formatter_ex_lib/build) \
+          CXX=${{ matrix.compiler }}++ cmake \
+            -Dformatter_ex_lib_DIR=$(realpath ../../formatter_ex_lib/build) \
             -Dsolver_lib_DIR=$(realpath ../../solver_lib/build) ..
           cmake --build .
 
+      # Шаг 7: Запускаем тесты
       - name: Run tests
         run: |
+          # Проверяем что бинарные файлы созданы
+          file hello_world_application/build/hello_world
+          file solver_application/build/solver_application
+          
+          # Запускаем программы
           ./hello_world_application/build/hello_world
           ./solver_application/build/solver_application
