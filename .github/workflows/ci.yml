@@ -23,33 +23,43 @@ jobs:
           sudo apt-get install -y cmake build-essential clang
 
       - name: Build formatter_lib
+        working-directory: formatter_lib
         run: |
-          mkdir -p formatter_lib/build && cd formatter_lib/build
+          mkdir -p build && cd build
           cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ ..
           cmake --build .
 
       - name: Build formatter_ex_lib
+        working-directory: formatter_ex_lib
         run: |
-          mkdir -p formatter_ex_lib/build && cd formatter_ex_lib/build
-          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ -Dformatter_DIR=../formatter_lib/build ..
+          mkdir -p build && cd build
+          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ \
+            -Dformatter_DIR=$(realpath ../../formatter_lib/build) ..
           cmake --build .
 
       - name: Build solver_lib
+        working-directory: solver_lib
         run: |
-          mkdir -p solver_lib/build && cd solver_lib/build
-          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ -Dformatter_ex_DIR=../formatter_ex_lib/build ..
+          mkdir -p build && cd build
+          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ \
+            -Dformatter_ex_DIR=$(realpath ../../formatter_ex_lib/build) ..
           cmake --build .
 
-      - name: Build applications
+      - name: Build hello_world
+        working-directory: hello_world_application
         run: |
-          # Hello World
-          mkdir -p hello_world_application/build && cd hello_world_application/build
-          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ -Dformatter_ex_DIR=../../formatter_ex_lib/build ..
+          mkdir -p build && cd build
+          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ \
+            -Dformatter_ex_DIR=$(realpath ../../formatter_ex_lib/build) ..
           cmake --build .
-          
-          # Solver App
-          mkdir -p solver_application/build && cd solver_application/build
-          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ -Dformatter_ex_DIR=../../formatter_ex_lib/build -Dsolver_lib_DIR=../../solver_lib/build ..
+
+      - name: Build solver_app
+        working-directory: solver_application
+        run: |
+          mkdir -p build && cd build
+          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ \
+            -Dformatter_ex_DIR=$(realpath ../../formatter_ex_lib/build) \
+            -Dsolver_lib_DIR=$(realpath ../../solver_lib/build) ..
           cmake --build .
 
       - name: Run tests
