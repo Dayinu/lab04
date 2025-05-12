@@ -1,0 +1,70 @@
+name: CI Build (Linux - GCC & Clang)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler: [ gcc, clang ]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential
+
+      - name: Build formatter_lib
+        run: |
+          mkdir -p /tmp/build/formatter_lib
+          cd /tmp/build/formatter_lib
+          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ ~/lab04/formatter_lib
+          cmake --build .
+
+      - name: Build formatter_ex_lib
+        run: |
+          mkdir -p /tmp/build/formatter_ex_lib
+          cd /tmp/build/formatter_ex_lib
+          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ \
+                -Dformatter_DIR=/tmp/build/formatter_lib \
+                ~/lab04/formatter_ex_lib
+          cmake --build .
+
+      - name: Build solver_lib
+        run: |
+          mkdir -p /tmp/build/solver_lib
+          cd /tmp/build/solver_lib
+          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ \
+                -Dformatter_ex_DIR=/tmp/build/formatter_ex_lib \
+                ~/lab04/solver_lib
+          cmake --build .
+
+      - name: Build hello_world_application
+        run: |
+          mkdir -p /tmp/build/hello_world
+          cd /tmp/build/hello_world
+          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ \
+                -Dformatter_ex_DIR=/tmp/build/formatter_ex_lib \
+                ~/lab04/hello_world_application
+          cmake --build .
+
+      - name: Build solver_application
+        run: |
+          mkdir -p /tmp/build/solver_app
+          cd /tmp/build/solver_app
+          cmake -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}++ \
+                -Dformatter_ex_DIR=/tmp/build/formatter_ex_lib \
+                -Dsolver_lib_DIR=/tmp/build/solver_lib \
+                ~/lab04/solver_application
+          cmake --build .
+
+      - name: Run tests
+        run: |
+          /tmp/build/hello_world/hello_world
+          /tmp/build/solver_app/solver_application

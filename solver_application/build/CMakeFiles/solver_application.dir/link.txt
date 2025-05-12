@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/solver_application.dir/equation.cpp.o -o solver_application  /home/linux/lab03/solver_application/../solver_lib/build/libsolver_lib.a /home/linux/lab03/solver_application/../formatter_ex_lib/build/libformatter_ex.a /home/linux/lab03/solver_application/../formatter_lib/build/libformatter.a -lm

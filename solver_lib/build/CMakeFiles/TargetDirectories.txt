@@ -1,0 +1,6 @@
+/home/linux/lab03/solver_lib/build/CMakeFiles/solver_lib.dir
+/home/linux/lab03/solver_lib/build/CMakeFiles/edit_cache.dir
+/home/linux/lab03/solver_lib/build/CMakeFiles/rebuild_cache.dir
+/home/linux/lab03/solver_lib/build/formatter_ex/CMakeFiles/formatter_ex.dir
+/home/linux/lab03/solver_lib/build/formatter_ex/CMakeFiles/edit_cache.dir
+/home/linux/lab03/solver_lib/build/formatter_ex/CMakeFiles/rebuild_cache.dir
