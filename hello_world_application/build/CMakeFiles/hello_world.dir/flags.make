@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/linux/lab03_new/lab03/formatter_ex_lib -I/home/linux/lab03_new/lab03/formatter_ex_lib/../formatter_lib -I/home/linux/lab03_new/lab03/formatter_lib
+CXX_INCLUDES = -I/home/linux/lab03_new/lab03/hello_world_application/formatter_ex_lib -I/home/linux/lab03_new/lab03/hello_world_application/formatter_lib
 
-CXX_FLAGS = -std=gnu++11
+CXX_FLAGS = 
 

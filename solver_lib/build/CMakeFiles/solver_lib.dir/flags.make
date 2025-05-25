@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/home/linux/lab03_new/lab03/solver_lib
 
-CXX_FLAGS = -std=gnu++11
+CXX_FLAGS = 
 

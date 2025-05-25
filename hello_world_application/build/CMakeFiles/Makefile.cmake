@@ -7,8 +7,6 @@ set(CMAKE_DEPENDS_GENERATOR "Unix Makefiles")
 # The top level Makefile was generated from the following files:
 set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
-  "/home/linux/lab03_new/lab03/formatter_ex_lib/CMakeLists.txt"
-  "/home/linux/lab03_new/lab03/formatter_lib/CMakeLists.txt"
   "/home/linux/lab03_new/lab03/hello_world_application/CMakeLists.txt"
   "CMakeFiles/3.30.5/CMakeCCompiler.cmake"
   "CMakeFiles/3.30.5/CMakeCXXCompiler.cmake"
@@ -125,13 +123,9 @@ set(CMAKE_MAKEFILE_PRODUCTS
   "CMakeFiles/3.30.5/CMakeCCompiler.cmake"
   "CMakeFiles/3.30.5/CMakeCXXCompiler.cmake"
   "CMakeFiles/CMakeDirectoryInformation.cmake"
-  "formatter_ex_lib/CMakeFiles/CMakeDirectoryInformation.cmake"
-  "formatter_ex_lib/formatter_build/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/hello_world.dir/DependInfo.cmake"
-  "formatter_ex_lib/CMakeFiles/formatter_ex.dir/DependInfo.cmake"
-  "formatter_ex_lib/formatter_build/CMakeFiles/formatter.dir/DependInfo.cmake"
   )

@@ -85,51 +85,6 @@ rebuild_cache:
 rebuild_cache/fast: rebuild_cache
 .PHONY : rebuild_cache/fast
 
-# Special rule for the target list_install_components
-list_install_components:
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Available install components are: \"Unspecified\""
-.PHONY : list_install_components
-
-# Special rule for the target list_install_components
-list_install_components/fast: list_install_components
-.PHONY : list_install_components/fast
-
-# Special rule for the target install
-install: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
-.PHONY : install
-
-# Special rule for the target install
-install/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
-.PHONY : install/fast
-
-# Special rule for the target install/local
-install/local: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local
-
-# Special rule for the target install/local
-install/local/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local/fast
-
-# Special rule for the target install/strip
-install/strip: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-.PHONY : install/strip
-
-# Special rule for the target install/strip
-install/strip/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-.PHONY : install/strip/fast
-
 # The main all target
 all: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/linux/lab03_new/lab03/solver_application/build/CMakeFiles /home/linux/lab03_new/lab03/solver_application/build//CMakeFiles/progress.marks
@@ -174,45 +129,6 @@ solver/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/solver.dir/build.make CMakeFiles/solver.dir/build
 .PHONY : solver/fast
 
-#=============================================================================
-# Target rules for targets named formatter_ex
-
-# Build rule for target.
-formatter_ex: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 formatter_ex
-.PHONY : formatter_ex
-
-# fast build rule for target.
-formatter_ex/fast:
-	$(MAKE) $(MAKESILENT) -f formatter_ex_lib/CMakeFiles/formatter_ex.dir/build.make formatter_ex_lib/CMakeFiles/formatter_ex.dir/build
-.PHONY : formatter_ex/fast
-
-#=============================================================================
-# Target rules for targets named formatter
-
-# Build rule for target.
-formatter: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 formatter
-.PHONY : formatter
-
-# fast build rule for target.
-formatter/fast:
-	$(MAKE) $(MAKESILENT) -f formatter_ex_lib/formatter_build/CMakeFiles/formatter.dir/build.make formatter_ex_lib/formatter_build/CMakeFiles/formatter.dir/build
-.PHONY : formatter/fast
-
-#=============================================================================
-# Target rules for targets named solver_lib
-
-# Build rule for target.
-solver_lib: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 solver_lib
-.PHONY : solver_lib
-
-# fast build rule for target.
-solver_lib/fast:
-	$(MAKE) $(MAKESILENT) -f solver_lib/CMakeFiles/solver_lib.dir/build.make solver_lib/CMakeFiles/solver_lib.dir/build
-.PHONY : solver_lib/fast
-
 equation.o: equation.cpp.o
 .PHONY : equation.o
 
@@ -244,15 +160,8 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... edit_cache"
-	@echo "... install"
-	@echo "... install/local"
-	@echo "... install/strip"
-	@echo "... list_install_components"
 	@echo "... rebuild_cache"
-	@echo "... formatter"
-	@echo "... formatter_ex"
 	@echo "... solver"
-	@echo "... solver_lib"
 	@echo "... equation.o"
 	@echo "... equation.i"
 	@echo "... equation.s"

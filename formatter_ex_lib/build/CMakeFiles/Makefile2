@@ -64,46 +64,29 @@ CMAKE_BINARY_DIR = /home/linux/lab03_new/lab03/formatter_ex_lib/build
 
 # The main recursive "all" target.
 all: CMakeFiles/formatter_ex.dir/all
-all: formatter_build/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
-preinstall: formatter_build/preinstall
+preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
 clean: CMakeFiles/formatter_ex.dir/clean
-clean: formatter_build/clean
 .PHONY : clean
-
-#=============================================================================
-# Directory level rules for directory formatter_build
-
-# Recursive "all" directory target.
-formatter_build/all: formatter_build/CMakeFiles/formatter.dir/all
-.PHONY : formatter_build/all
-
-# Recursive "preinstall" directory target.
-formatter_build/preinstall:
-.PHONY : formatter_build/preinstall
-
-# Recursive "clean" directory target.
-formatter_build/clean: formatter_build/CMakeFiles/formatter.dir/clean
-.PHONY : formatter_build/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/formatter_ex.dir
 
 # All Build rule for target.
-CMakeFiles/formatter_ex.dir/all: formatter_build/CMakeFiles/formatter.dir/all
+CMakeFiles/formatter_ex.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/formatter_ex.dir/build.make CMakeFiles/formatter_ex.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/formatter_ex.dir/build.make CMakeFiles/formatter_ex.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/linux/lab03_new/lab03/formatter_ex_lib/build/CMakeFiles --progress-num=3,4 "Built target formatter_ex"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/linux/lab03_new/lab03/formatter_ex_lib/build/CMakeFiles --progress-num=1,2 "Built target formatter_ex"
 .PHONY : CMakeFiles/formatter_ex.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/formatter_ex.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/linux/lab03_new/lab03/formatter_ex_lib/build/CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/linux/lab03_new/lab03/formatter_ex_lib/build/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/formatter_ex.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/linux/lab03_new/lab03/formatter_ex_lib/build/CMakeFiles 0
 .PHONY : CMakeFiles/formatter_ex.dir/rule
@@ -116,32 +99,6 @@ formatter_ex: CMakeFiles/formatter_ex.dir/rule
 CMakeFiles/formatter_ex.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/formatter_ex.dir/build.make CMakeFiles/formatter_ex.dir/clean
 .PHONY : CMakeFiles/formatter_ex.dir/clean
-
-#=============================================================================
-# Target rules for target formatter_build/CMakeFiles/formatter.dir
-
-# All Build rule for target.
-formatter_build/CMakeFiles/formatter.dir/all:
-	$(MAKE) $(MAKESILENT) -f formatter_build/CMakeFiles/formatter.dir/build.make formatter_build/CMakeFiles/formatter.dir/depend
-	$(MAKE) $(MAKESILENT) -f formatter_build/CMakeFiles/formatter.dir/build.make formatter_build/CMakeFiles/formatter.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/linux/lab03_new/lab03/formatter_ex_lib/build/CMakeFiles --progress-num=1,2 "Built target formatter"
-.PHONY : formatter_build/CMakeFiles/formatter.dir/all
-
-# Build rule for subdir invocation for target.
-formatter_build/CMakeFiles/formatter.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/linux/lab03_new/lab03/formatter_ex_lib/build/CMakeFiles 2
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 formatter_build/CMakeFiles/formatter.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/linux/lab03_new/lab03/formatter_ex_lib/build/CMakeFiles 0
-.PHONY : formatter_build/CMakeFiles/formatter.dir/rule
-
-# Convenience name for target.
-formatter: formatter_build/CMakeFiles/formatter.dir/rule
-.PHONY : formatter
-
-# clean rule for target.
-formatter_build/CMakeFiles/formatter.dir/clean:
-	$(MAKE) $(MAKESILENT) -f formatter_build/CMakeFiles/formatter.dir/build.make formatter_build/CMakeFiles/formatter.dir/clean
-.PHONY : formatter_build/CMakeFiles/formatter.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.
