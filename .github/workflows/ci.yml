@@ -2,20 +2,19 @@ name: CI Build
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
-  linux_build:
-    name: Linux (${{ matrix.compiler }} - ${{ matrix.build_type }})
+  build:
     strategy:
       matrix:
         compiler: [gcc, clang]
         build_type: [Debug, Release]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
     
     - name: Install dependencies
       run: |
@@ -40,47 +39,32 @@ jobs:
           
     - name: Build
       run: |
-        cmake --build build --parallel 2
+        cmake --build build --config ${{ matrix.build_type }} --parallel 2
         
     - name: Run tests
       run: |
         cd build && ctest --output-on-failure
 
-  windows_build:
-    name: Windows (${{ matrix.build_type }})
+  build_on_windows:
+    runs-on: ${{matrix.os}}
     strategy:
+      fail-fast: false
       matrix:
-        build_type: [Debug, Release]
-    runs-on: windows-latest
+        os: [windows-latest]
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: checking out repository
+        uses: actions/checkout@v4
 
-    - name: Configure CMake
-      run: |
-        cmake -B build -G "Visual Studio 17 2022" -A x64
+      - name: preparing build
+        run:  cmake . -B_build 
+      - name: building
+        run:  cmake --build _build
+      - name: checking programs output
+        run:  |
+          echo "1 -5  6" | _build\solver_application\Debug\solver_app 
+          _build\hello_world_application\Debug\hello
 
-    - name: Build project
-      run: |
-        cmake --build build --config ${{ matrix.build_type }} --parallel 2
-
-    - name: Find binaries location
-      id: find_binaries
-      shell: pwsh
-      run: |
-        # Определяем путь к бинарникам
-        $solverPath = (Get-ChildItem -Path build -Recurse -Filter "solver_app.exe" | Where-Object { $_.DirectoryName -match "\\${{ matrix.build_type }}\\" }).FullName
-        $helloPath = (Get-ChildItem -Path build -Recurse -Filter "hello.exe" | Where-Object { $_.DirectoryName -match "\\${{ matrix.build_type }}\\" }).FullName
-        
-        if (-not $solverPath) { throw "solver_app.exe not found" }
-        if (-not $helloPath) { throw "hello.exe not found" }
-        
-        Write-Host "solver_path=$solverPath" >> $env:GITHUB_OUTPUT
-        Write-Host "hello_path=$helloPath" >> $env:GITHUB_OUTPUT
-
-    - name: Run applications
-      shell: pwsh
-      run: |
-        # Используем найденные пути
-        "1 -5 6" | & '${{ steps.find_binaries.outputs.solver_path }}'
-        & '${{ steps.find_binaries.outputs.hello_path }}'
+      - name: status info
+        run: echo ${{ job.status }} is status of job
+  
