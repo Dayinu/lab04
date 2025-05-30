@@ -64,7 +64,23 @@ jobs:
       run: |
         cmake --build build --config ${{ matrix.build_type }} --parallel 2
 
-    - name: Run applications
+    - name: Find binaries location
+      id: find_binaries
+      shell: pwsh
       run: |
-        echo "1 -5 6" | .\build\solver_application\${{ matrix.build_type }}\solver_app.exe
-        .\build\hello_world_application\${{ matrix.build_type }}\hello.exe
+        # Определяем путь к бинарникам
+        $solverPath = (Get-ChildItem -Path build -Recurse -Filter "solver_app.exe" | Where-Object { $_.DirectoryName -match "\\${{ matrix.build_type }}\\" }).FullName
+        $helloPath = (Get-ChildItem -Path build -Recurse -Filter "hello.exe" | Where-Object { $_.DirectoryName -match "\\${{ matrix.build_type }}\\" }).FullName
+        
+        if (-not $solverPath) { throw "solver_app.exe not found" }
+        if (-not $helloPath) { throw "hello.exe not found" }
+        
+        Write-Host "solver_path=$solverPath" >> $env:GITHUB_OUTPUT
+        Write-Host "hello_path=$helloPath" >> $env:GITHUB_OUTPUT
+
+    - name: Run applications
+      shell: pwsh
+      run: |
+        # Используем найденные пути
+        "1 -5 6" | & '${{ steps.find_binaries.outputs.solver_path }}'
+        & '${{ steps.find_binaries.outputs.hello_path }}'
