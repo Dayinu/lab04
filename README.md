@@ -23,7 +23,8 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  linux-build:
+    name: Linux (${{ matrix.compiler }}, ${{ matrix.build_type }})
     strategy:
       matrix:
         compiler: [gcc, clang]
@@ -60,6 +61,28 @@ jobs:
     - name: Run tests
       run: |
         cd build && ctest --output-on-failure
+
+  windows-build:
+    name: Windows (MSVC, ${{ matrix.build_type }})
+    strategy:
+      matrix:
+        build_type: [Debug, Release]
+    runs-on: windows-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Configure CMake
+      run: |
+        cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        
+    - name: Build project
+      run: |
+        cmake --build build --config ${{ matrix.build_type }} --parallel 2
+        
+    - name: Run tests
+      run: |
+        cd build && ctest -C ${{ matrix.build_type }} --output-on-failure
 EOF
 
 ```
