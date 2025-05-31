@@ -7,7 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  linux-build:
+    name: Linux (${{ matrix.compiler }}, ${{ matrix.build_type }})
     strategy:
       matrix:
         compiler: [gcc, clang]
@@ -45,39 +46,24 @@ jobs:
       run: |
         cd build && ctest --output-on-failure
 
-  windows_build:
-    name: Windows (${{ matrix.build_type }})
+  windows-build:
+    name: Windows (MSVC, ${{ matrix.build_type }})
     strategy:
       matrix:
         build_type: [Debug, Release]
     runs-on: windows-latest
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
     - name: Configure CMake
       run: |
-        cmake -B build -G "Visual Studio 17 2022" -A x64
-
+        cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        
     - name: Build project
       run: |
         cmake --build build --config ${{ matrix.build_type }} --parallel 2
-
-    - name: Find binaries location
-      id: find_binaries
-      shell: pwsh
-      run: |
-        $equationPath = Get-ChildItem -Path build -Recurse -Filter "equation.exe" | Where-Object { $_.DirectoryName -match "\\${{ matrix.build_type }}\\" } | Select-Object -First 1 -ExpandProperty FullName
-        $helloPath = Get-ChildItem -Path build -Recurse -Filter "hello_world*.exe" | Where-Object { $_.DirectoryName -match "\\${{ matrix.build_type }}\\" } | Select-Object -First 1 -ExpandProperty FullName
         
-        if (-not $equationPath) { throw "equation.exe not found in ${{ matrix.build_type }} configuration" }
-        if (-not $helloPath) { throw "hello_world executable not found in ${{ matrix.build_type }} configuration" }
-        
-        Write-Output "equation_path=$equationPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-        Write-Output "hello_path=$helloPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-
-    - name: Run applications
-      shell: pwsh
+    - name: Run tests
       run: |
-        "1 -5 6" | & "${{ steps.find_binaries.outputs.equation_path }}"
-        & "${{ steps.find_binaries.outputs.hello_path }}"
+        cd build && ctest -C ${{ matrix.build_type }} --output-on-failure
