@@ -67,17 +67,17 @@ jobs:
       id: find_binaries
       shell: pwsh
       run: |
-        $solverPath = Get-ChildItem -Path build -Recurse -Filter "equation.exe" | Where-Object { $_.DirectoryName -match "\\${{ matrix.build_type }}\\" } | Select-Object -First 1 -ExpandProperty FullName
-        $helloPath = Get-ChildItem -Path build -Recurse -Filter "hello_world_application.exe" | Where-Object { $_.DirectoryName -match "\\${{ matrix.build_type }}\\" } | Select-Object -First 1 -ExpandProperty FullName
+        $equationPath = Get-ChildItem -Path build -Recurse -Filter "equation.exe" | Where-Object { $_.DirectoryName -match "\\${{ matrix.build_type }}\\" } | Select-Object -First 1 -ExpandProperty FullName
+        $helloPath = Get-ChildItem -Path build -Recurse -Filter "hello_world*.exe" | Where-Object { $_.DirectoryName -match "\\${{ matrix.build_type }}\\" } | Select-Object -First 1 -ExpandProperty FullName
         
-        if (-not $solverPath) { throw "equation.exe not found in ${{ matrix.build_type }} configuration" }
-        if (-not $helloPath) { throw "hello_world_application.exe not found in ${{ matrix.build_type }} configuration" }
+        if (-not $equationPath) { throw "equation.exe not found in ${{ matrix.build_type }} configuration" }
+        if (-not $helloPath) { throw "hello_world executable not found in ${{ matrix.build_type }} configuration" }
         
-        Write-Output "solver_path=$solverPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        Write-Output "equation_path=$equationPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
         Write-Output "hello_path=$helloPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
     - name: Run applications
       shell: pwsh
       run: |
-        "1 -5 6" | & "${{ steps.find_binaries.outputs.solver_path }}"
+        "1 -5 6" | & "${{ steps.find_binaries.outputs.equation_path }}"
         & "${{ steps.find_binaries.outputs.hello_path }}"
